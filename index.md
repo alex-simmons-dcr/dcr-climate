@@ -1,4 +1,5 @@
 ---
+layout: default
 title: DCR Office of Climate Resilience GitHub
 ---
 
