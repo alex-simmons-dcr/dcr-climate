@@ -18,4 +18,4 @@ The Office of Climate Resilience serves as the hub for climate action at the Dep
 
 Explore the interactive data visualizations hosted in this repository:
 
-* **[DCR Onsite Fossil Fuel Emissions](https://alex-simmons-dcr.github.io/dcr-climate/onsite%20emissions.html)**
+* **[DCR Onsite Fossil Fuel Emissions](./onsite%20emissions.html)**
