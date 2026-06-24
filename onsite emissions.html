@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FY04 - FY24 DCR Onsite Fossil Fuel Emissions</title>
+    <!-- Load Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        /* Modern System Font Stack */
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f6f8;
+            color: #333333;
+        }
+        
+        .chart-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        /* Standard WCAG utility class to visually hide elements while keeping them accessible to screen readers */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Subtle CSS transition for the SVG elements */
+        .js-plotly-plot .points path {
+            transition: opacity 0.2s ease-in-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main container acting as a landmark for screen readers -->
+    <div class="chart-container" role="region" aria-label="Onsite Fossil Fuel Emissions Dashboard">
+        
+        <!-- The Interactive Chart -->
+        <div 
+            id="emissionsChart" 
+            role="img" 
+            aria-label="Interactive bar chart showing Onsite Fossil Fuel Emissions from FY04 to FY50 Target. A complete data table is available immediately following this chart for screen reader users."
+            style="width:100%; height:650px;">
+        </div>
+
+        <!-- The Accessible Fallback Data Table -->
+        <div class="sr-only">
+            <table aria-label="Data for Onsite Fossil Fuel Emissions">
+                <thead>
+                    <tr>
+                        <th scope="col">Fiscal Year</th>
+                        <th scope="col">Emissions (MTCO2e)</th>
+                        <th scope="col">Percent Change</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="sr-table-body">
+                    <!-- Table rows populated dynamically via JavaScript below -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // 1. Data Setup
+        const years = ['FY04', 'FY05', 'FY06', 'FY07', 'FY08', 'FY09', 'FY10', 'FY11', 'FY12', 'FY13', 'FY14', 'FY15', 'FY16', 'FY17', 'FY18', 'FY19', 'FY20', 'FY21', 'FY22', 'FY23', 'FY24', 'FY25 Target', 'FY30 Target', 'FY40 Target', 'FY50 Target'];
+        const emissions = [11051.00, 10803.39, 11668.41, 9931.52, 8999.14, 10870.15, 11078.17, 9864.39, 9587.93, 9987.50, 10392.97, 11055.43, 9658.56, 10758.85, 11255.02, 11699.40, 10084.63, 10017.50, 10338.87, 9314.26, 8953.25, 8840.80, 7183.15, 4420.40, 552.55];
+        const percentChange = [0.00, -2.24, 5.59, -10.13, -18.57, -1.64, 0.25, -10.74, -13.24, -9.62, -5.95, 0.04, -12.60, -2.64, 1.85, 5.87, -8.74, -9.35, -6.44, -15.72, -18.98, -20.00, -35.00, -60.00, -95.00];
+        
+        // 2. Formatting Configurations
+        const percentLabels = percentChange.map(val => val.toFixed(0) + '%');
+        const statuses = years.map(year => year.includes('Target') ? 'Target' : 'Reported');
+        const barColors = years.map(year => year.includes('Target') ? '#7CA8D0' : '#004A8F');
+
+        // Dynamically build the screen reader table using the data arrays
+        const tableBody = document.getElementById('sr-table-body');
+        years.forEach((year, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${year}</td>
+                <td>${emissions[index].toLocaleString()}</td>
+                <td>${percentLabels[index]}</td>
+                <td>${statuses[index]}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+
+        // 3. Define the Bar Chart Trace
+        const traceEmissions = {
+            x: years,
+            y: emissions,
+            type: 'bar',
+            text: percentLabels,
+            textposition: 'outside',
+            textfont: { size: 13, color: '#333333' },
+            marker: { 
+                color: barColors,
+                line: { color: 'rgba(0,0,0,0.1)', width: 1 } 
+            },
+            opacity: 0.75, 
+            
+            hovertemplate: 
+                '<b>%{x}</b><br>' +
+                'Emissions: %{y:,.0f} MTCO2e<br>' +
+                'Change: %{text}' +
+                '<extra></extra>' 
+        };
+
+        const chartData = [traceEmissions];
+
+        // 4. Layout Configuration
+        const layout = {
+            font: { family: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
+            annotations: [
+                {
+                    x: 0, y: 1.18, xref: 'paper', yref: 'paper', 
+                    text: 'FY04 - FY24 Onsite Fossil Fuel Emissions',
+                    showarrow: false,
+                    font: { size: 22, color: '#111111', weight: 'bold' },
+                    xanchor: 'left'
+                },
+                {
+                    x: 0, y: 1.08, xref: 'paper', yref: 'paper', 
+                    text: 'Measured in Metric Tons of Carbon Dioxide Equivalent (MTCO2e)',
+                    showarrow: false,
+                    font: { size: 14, color: '#666666' },
+                    xanchor: 'left'
+                },
+                {
+                    x: 1, y: -0.22, xref: 'paper', yref: 'paper',
+                    text: 'Source: Massachusetts LBE',
+                    showarrow: false,
+                    font: { size: 12, color: '#888888' },
+                    xanchor: 'right'
+                }
+            ],
+            shapes: [
+                {
+                    type: 'line',
+                    x0: 20.5, 
+                    x1: 20.5,
+                    y0: 0,
+                    y1: 1,
+                    yref: 'paper', 
+                    line: {
+                        color: '#555555',
+                        width: 2,
+                        dash: 'dash'
+                    }
+                }
+            ],
+            xaxis: {
+                tickangle: -45, 
+                tickfont: { size: 12, color: '#333333' }
+            },
+            yaxis: {
+                range: [0, 15000],
+                dtick: 2000,         
+                tickfont: { color: '#004A8F', size: 13 },
+                gridcolor: '#e8e8e8', 
+                zeroline: true,
+                zerolinecolor: '#cccccc'
+            },
+            hovermode: 'closest', 
+            hoverlabel: {
+                bgcolor: '#ffffff',
+                font: { size: 14, color: '#333333' },
+                bordercolor: 'auto', 
+                borderwidth: 2       
+            },
+            showlegend: false,
+            margin: { l: 60, r: 40, t: 120, b: 120 } 
+        };
+
+        // 5. Render the Chart
+        Plotly.newPlot('emissionsChart', chartData, layout, {
+            responsive: true,
+            // Removes the lasso and box select tools from the modebar
+            modeBarButtonsToRemove: ['lasso2d', 'select2d']
+        });
+    </script>
+
+</body>
+</html>
