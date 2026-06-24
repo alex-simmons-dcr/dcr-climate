@@ -24,6 +24,12 @@
             margin: 0 auto;
         }
 
+        /* Responsive CSS to reduce padding on mobile screens */
+        @media (max-width: 768px) {
+            body { margin: 10px; }
+            .chart-container { padding: 15px; }
+        }
+
         /* Standard WCAG utility class to visually hide elements while keeping them accessible to screen readers */
         .sr-only {
             position: absolute;
@@ -85,7 +91,7 @@
         const statuses = years.map(year => year.includes('Target') ? 'Target' : 'Reported');
         const barColors = years.map(year => year.includes('Target') ? '#7CA8D0' : '#004A8F');
 
-        // Dynamically build the screen reader table using the data arrays
+        // Dynamically build the screen reader table
         const tableBody = document.getElementById('sr-table-body');
         years.forEach((year, index) => {
             const tr = document.createElement('tr');
@@ -98,99 +104,119 @@
             tableBody.appendChild(tr);
         });
 
-        // 3. Define the Bar Chart Trace
-        const traceEmissions = {
-            x: years,
-            y: emissions,
-            type: 'bar',
-            text: percentLabels,
-            textposition: 'outside',
-            textfont: { size: 13, color: '#333333' },
-            marker: { 
-                color: barColors,
-                line: { color: 'rgba(0,0,0,0.1)', width: 1 } 
-            },
-            opacity: 0.75, 
-            
-            hovertemplate: 
-                '<b>%{x}</b><br>' +
-                'Emissions: %{y:,.0f} MTCO2e<br>' +
-                'Change: %{text}' +
-                '<extra></extra>' 
-        };
+        // 3. Dynamic Rendering Function
+        function renderChart() {
+            // Detect if the screen is mobile-sized (less than 768px wide)
+            const isMobile = window.innerWidth < 768;
 
-        const chartData = [traceEmissions];
+            // Define the Trace, dynamically adjusting font size for bar labels
+            const traceEmissions = {
+                x: years,
+                y: emissions,
+                type: 'bar',
+                text: percentLabels,
+                textposition: 'outside',
+                textfont: { 
+                    size: isMobile ? 10 : 13, // Shrink bar text on mobile
+                    color: '#333333' 
+                },
+                marker: { 
+                    color: barColors,
+                    line: { color: 'rgba(0,0,0,0.1)', width: 1 } 
+                },
+                opacity: 0.75, 
+                hovertemplate: 
+                    '<b>%{x}</b><br>' +
+                    'Emissions: %{y:,.0f} MTCO2e<br>' +
+                    'Change: %{text}' +
+                    '<extra></extra>' 
+            };
 
-        // 4. Layout Configuration
-        const layout = {
-            font: { family: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
-            annotations: [
-                {
-                    x: 0, y: 1.18, xref: 'paper', yref: 'paper', 
-                    text: 'FY04 - FY24 Onsite Fossil Fuel Emissions',
-                    showarrow: false,
-                    font: { size: 22, color: '#111111', weight: 'bold' },
-                    xanchor: 'left'
-                },
-                {
-                    x: 0, y: 1.08, xref: 'paper', yref: 'paper', 
-                    text: 'Measured in Metric Tons of Carbon Dioxide Equivalent (MTCO2e)',
-                    showarrow: false,
-                    font: { size: 14, color: '#666666' },
-                    xanchor: 'left'
-                },
-                {
-                    x: 1, y: -0.22, xref: 'paper', yref: 'paper',
-                    text: 'Source: Massachusetts LBE',
-                    showarrow: false,
-                    font: { size: 12, color: '#888888' },
-                    xanchor: 'right'
-                }
-            ],
-            shapes: [
-                {
-                    type: 'line',
-                    x0: 20.5, 
-                    x1: 20.5,
-                    y0: 0,
-                    y1: 1,
-                    yref: 'paper', 
-                    line: {
-                        color: '#555555',
-                        width: 2,
-                        dash: 'dash'
+            const chartData = [traceEmissions];
+
+            // Define the Layout, dynamically adjusting fonts, titles, and margins
+            const layout = {
+                font: { family: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
+                annotations: [
+                    {
+                        x: 0, y: 1.18, xref: 'paper', yref: 'paper', 
+                        text: 'FY04 - FY24 Onsite Fossil Fuel Emissions',
+                        showarrow: false,
+                        font: { size: isMobile ? 14 : 22, color: '#111111', weight: 'bold' },
+                        xanchor: 'left'
+                    },
+                    {
+                        x: 0, y: 1.08, xref: 'paper', yref: 'paper', 
+                        // Shorten the subtitle on mobile to prevent overflow
+                        text: isMobile ? 'Measured in MTCO2e' : 'Measured in Metric Tons of Carbon Dioxide Equivalent (MTCO2e)',
+                        showarrow: false,
+                        font: { size: isMobile ? 11 : 14, color: '#666666' },
+                        xanchor: 'left'
+                    },
+                    {
+                        x: 1, y: -0.22, xref: 'paper', yref: 'paper',
+                        text: 'Source: Massachusetts LBE',
+                        showarrow: false,
+                        font: { size: isMobile ? 10 : 12, color: '#888888' },
+                        xanchor: 'right'
                     }
-                }
-            ],
-            xaxis: {
-                tickangle: -45, 
-                tickfont: { size: 12, color: '#333333' }
-            },
-            yaxis: {
-                range: [0, 15000],
-                dtick: 2000,         
-                tickfont: { color: '#004A8F', size: 13 },
-                gridcolor: '#e8e8e8', 
-                zeroline: true,
-                zerolinecolor: '#cccccc'
-            },
-            hovermode: 'closest', 
-            hoverlabel: {
-                bgcolor: '#ffffff',
-                font: { size: 14, color: '#333333' },
-                bordercolor: 'auto', 
-                borderwidth: 2       
-            },
-            showlegend: false,
-            margin: { l: 60, r: 40, t: 120, b: 120 } 
-        };
+                ],
+                shapes: [
+                    {
+                        type: 'line',
+                        x0: 20.5, 
+                        x1: 20.5,
+                        y0: 0,
+                        y1: 1,
+                        yref: 'paper', 
+                        line: { color: '#555555', width: 2, dash: 'dash' }
+                    }
+                ],
+                xaxis: {
+                    // Turn labels straight up and down on mobile so they don't overlap
+                    tickangle: isMobile ? -90 : -45, 
+                    tickfont: { size: isMobile ? 10 : 12, color: '#333333' },
+                    automargin: true // Helps Plotly auto-adjust axis space
+                },
+                yaxis: {
+                    range: [0, 15000],
+                    dtick: 2000,         
+                    tickfont: { color: '#004A8F', size: isMobile ? 11 : 13 },
+                    gridcolor: '#e8e8e8', 
+                    zeroline: true,
+                    zerolinecolor: '#cccccc',
+                    automargin: true
+                },
+                hovermode: 'closest', 
+                hoverlabel: {
+                    bgcolor: '#ffffff',
+                    font: { size: isMobile ? 12 : 14, color: '#333333' },
+                    bordercolor: 'auto', 
+                    borderwidth: 2       
+                },
+                showlegend: false,
+                // Tighten margins on mobile to maximize chart width
+                margin: { 
+                    l: isMobile ? 45 : 60, 
+                    r: isMobile ? 15 : 40, 
+                    t: isMobile ? 90 : 120, 
+                    b: isMobile ? 80 : 120 
+                } 
+            };
 
-        // 5. Render the Chart
-        Plotly.newPlot('emissionsChart', chartData, layout, {
-            responsive: true,
-            // Removes the lasso and box select tools from the modebar
-            modeBarButtonsToRemove: ['lasso2d', 'select2d']
-        });
+            // Plotly.react is highly efficient and will update the existing chart instead of redrawing the entire DOM
+            Plotly.react('emissionsChart', chartData, layout, {
+                responsive: true,
+                modeBarButtonsToRemove: ['lasso2d', 'select2d']
+            });
+        }
+
+        // 4. Initial Render
+        renderChart();
+
+        // 5. Re-render on Window Resize (e.g., rotating a mobile device)
+        window.addEventListener('resize', renderChart);
+
     </script>
 
 </body>
