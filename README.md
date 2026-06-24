@@ -1,12 +1,11 @@
 ---
 layout: default
-theme: jekyll-theme-primer
 title: DCR Climate Web Content
 ---
 
 # DCR Climate Web Content
 
-Welcome to the Github site for the [DCR Office of Climate Resilience](https://www.mass.gov/info-details/dcr-office-of-climate-resilience).
+Welcome to the GitHub site for the [DCR Office of Climate Resilience](https://www.mass.gov/info-details/dcr-office-of-climate-resilience).
 
 ## Repository Purpose
 
