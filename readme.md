@@ -1,8 +1,3 @@
----
-layout: default
-title: DCR Office of Climate Resilience GitHub
----
-
 # DCR Office of Climate Resilience GitHub
 
 Welcome to the GitHub site for the [DCR Office of Climate Resilience](https://www.mass.gov/info-details/dcr-office-of-climate-resilience).
