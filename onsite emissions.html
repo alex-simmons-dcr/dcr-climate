@@ -116,11 +116,11 @@
                 type: 'bar',
                 text: percentLabels,
                 textposition: 'outside',
-                textangle: isMobile ? -90 : 0, // Rotates labels 90 degrees on mobile to prevent overlap
+                textangle: isMobile ? -90 : 0, 
                 textfont: { 
-                    size: isMobile ? 10 : 13, 
+                    size: isMobile ? 12 : 13, // Increased from 10 to 12 for better mobile legibility
                     color: '#333333',
-                    weight: 'bold' // Makes the smaller text slightly easier to read
+                    weight: 'bold' 
                 },
                 marker: { 
                     color: barColors,
@@ -139,6 +139,7 @@
             // Define the Layout
             const layout = {
                 font: { family: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
+                dragmode: false, // Prevents the chart from intercepting drag/swipe events
                 annotations: [
                     {
                         x: 0, y: 1.18, xref: 'paper', yref: 'paper', 
@@ -176,7 +177,8 @@
                 xaxis: {
                     tickangle: isMobile ? -90 : -45, 
                     tickfont: { size: isMobile ? 10 : 12, color: '#333333' },
-                    automargin: true 
+                    automargin: true,
+                    fixedrange: true // Locks horizontal zooming/panning
                 },
                 yaxis: {
                     range: [0, 15000],
@@ -185,7 +187,8 @@
                     gridcolor: '#e8e8e8', 
                     zeroline: true,
                     zerolinecolor: '#cccccc',
-                    automargin: true
+                    automargin: true,
+                    fixedrange: true // Locks vertical zooming/panning
                 },
                 hovermode: 'closest', 
                 hoverlabel: {
@@ -198,7 +201,7 @@
                 margin: { 
                     l: isMobile ? 45 : 60, 
                     r: isMobile ? 15 : 40, 
-                    t: isMobile ? 110 : 120, // Increased mobile top margin
+                    t: isMobile ? 110 : 120, 
                     b: isMobile ? 80 : 120 
                 } 
             };
@@ -206,7 +209,7 @@
             // Render Chart
             Plotly.react('emissionsChart', chartData, layout, {
                 responsive: true,
-                displayModeBar: isMobile ? false : 'hover', // Completely hides toolbar on mobile
+                displayModeBar: isMobile ? false : 'hover', 
                 modeBarButtonsToRemove: ['lasso2d', 'select2d']
             });
         }
