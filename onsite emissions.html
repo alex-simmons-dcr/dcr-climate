@@ -109,16 +109,18 @@
             // Detect if the screen is mobile-sized (less than 768px wide)
             const isMobile = window.innerWidth < 768;
 
-            // Define the Trace, dynamically adjusting font size for bar labels
+            // Define the Trace
             const traceEmissions = {
                 x: years,
                 y: emissions,
                 type: 'bar',
                 text: percentLabels,
                 textposition: 'outside',
+                textangle: isMobile ? -90 : 0, // Rotates labels 90 degrees on mobile to prevent overlap
                 textfont: { 
-                    size: isMobile ? 10 : 13, // Shrink bar text on mobile
-                    color: '#333333' 
+                    size: isMobile ? 10 : 13, 
+                    color: '#333333',
+                    weight: 'bold' // Makes the smaller text slightly easier to read
                 },
                 marker: { 
                     color: barColors,
@@ -134,7 +136,7 @@
 
             const chartData = [traceEmissions];
 
-            // Define the Layout, dynamically adjusting fonts, titles, and margins
+            // Define the Layout
             const layout = {
                 font: { family: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
                 annotations: [
@@ -142,12 +144,11 @@
                         x: 0, y: 1.18, xref: 'paper', yref: 'paper', 
                         text: 'FY04 - FY24 Onsite Fossil Fuel Emissions',
                         showarrow: false,
-                        font: { size: isMobile ? 14 : 22, color: '#111111', weight: 'bold' },
+                        font: { size: isMobile ? 15 : 22, color: '#111111', weight: 'bold' },
                         xanchor: 'left'
                     },
                     {
                         x: 0, y: 1.08, xref: 'paper', yref: 'paper', 
-                        // Shorten the subtitle on mobile to prevent overflow
                         text: isMobile ? 'Measured in MTCO2e' : 'Measured in Metric Tons of Carbon Dioxide Equivalent (MTCO2e)',
                         showarrow: false,
                         font: { size: isMobile ? 11 : 14, color: '#666666' },
@@ -173,10 +174,9 @@
                     }
                 ],
                 xaxis: {
-                    // Turn labels straight up and down on mobile so they don't overlap
                     tickangle: isMobile ? -90 : -45, 
                     tickfont: { size: isMobile ? 10 : 12, color: '#333333' },
-                    automargin: true // Helps Plotly auto-adjust axis space
+                    automargin: true 
                 },
                 yaxis: {
                     range: [0, 15000],
@@ -195,18 +195,18 @@
                     borderwidth: 2       
                 },
                 showlegend: false,
-                // Tighten margins on mobile to maximize chart width
                 margin: { 
                     l: isMobile ? 45 : 60, 
                     r: isMobile ? 15 : 40, 
-                    t: isMobile ? 90 : 120, 
+                    t: isMobile ? 110 : 120, // Increased mobile top margin
                     b: isMobile ? 80 : 120 
                 } 
             };
 
-            // Plotly.react is highly efficient and will update the existing chart instead of redrawing the entire DOM
+            // Render Chart
             Plotly.react('emissionsChart', chartData, layout, {
                 responsive: true,
+                displayModeBar: isMobile ? false : 'hover', // Completely hides toolbar on mobile
                 modeBarButtonsToRemove: ['lasso2d', 'select2d']
             });
         }
@@ -214,7 +214,7 @@
         // 4. Initial Render
         renderChart();
 
-        // 5. Re-render on Window Resize (e.g., rotating a mobile device)
+        // 5. Re-render on Window Resize
         window.addEventListener('resize', renderChart);
 
     </script>
