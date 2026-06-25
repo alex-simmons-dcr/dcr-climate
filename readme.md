@@ -2,7 +2,7 @@
 
 Welcome to the GitHub site for the [DCR Office of Climate Resilience](https://www.mass.gov/info-details/dcr-office-of-climate-resilience).
 
-## Repository Purpose
+## Purpose
 
 The purpose of this repository is to host and manage web content specifically created for the DCR Office of Climate Resilience. This includes interactive maps, reports, and decarbonization trackers that help the agency communicate its climate action initiatives.
 
