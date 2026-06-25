@@ -45,7 +45,7 @@
 
         /* Subtle CSS transition for the SVG elements */
         .js-plotly-plot .points path {
-            transition: opacity 0.2s ease-in-out;
+            transition: fill-opacity 0.2s ease-in-out, stroke-width 0.2s ease-in-out;
         }
     </style>
 </head>
@@ -104,6 +104,9 @@
             tableBody.appendChild(tr);
         });
 
+        // Track if hover listeners are attached to prevent duplicates on resize
+        let hoverListenersAttached = false;
+
         // 3. Dynamic Rendering Function
         function renderChart() {
             // Detect if the screen is mobile-sized (less than 768px wide)
@@ -118,15 +121,16 @@
                 textposition: 'outside',
                 textangle: isMobile ? -90 : 0, 
                 textfont: { 
-                    size: isMobile ? 12 : 13, // Increased from 10 to 12 for better mobile legibility
+                    size: isMobile ? 12 : 13, 
                     color: '#333333',
                     weight: 'bold' 
                 },
+                // MOVED: Opacity is now inside the marker object
                 marker: { 
                     color: barColors,
+                    opacity: 0.75, 
                     line: { color: 'rgba(0,0,0,0.1)', width: 1 } 
                 },
-                opacity: 0.75, 
                 hovertemplate: 
                     '<b>%{x}</b><br>' +
                     'Emissions: %{y:,.0f} MTCO2e<br>' +
@@ -139,7 +143,7 @@
             // Define the Layout
             const layout = {
                 font: { family: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif' },
-                dragmode: false, // Prevents the chart from intercepting drag/swipe events
+                dragmode: false, 
                 annotations: [
                     {
                         x: 0, y: 1.18, xref: 'paper', yref: 'paper', 
@@ -178,7 +182,7 @@
                     tickangle: isMobile ? -90 : -45, 
                     tickfont: { size: isMobile ? 10 : 12, color: '#333333' },
                     automargin: true,
-                    fixedrange: true // Locks horizontal zooming/panning
+                    fixedrange: true 
                 },
                 yaxis: {
                     range: [0, 15000],
@@ -188,7 +192,7 @@
                     zeroline: true,
                     zerolinecolor: '#cccccc',
                     automargin: true,
-                    fixedrange: true // Locks vertical zooming/panning
+                    fixedrange: true 
                 },
                 hovermode: 'closest', 
                 hoverlabel: {
@@ -212,12 +216,45 @@
                 displayModeBar: isMobile ? false : 'hover', 
                 modeBarButtonsToRemove: ['lasso2d', 'select2d']
             });
+
+            // 4. Custom Hover/Highlight Logic
+            const myPlot = document.getElementById('emissionsChart');
+            
+            if (!hoverListenersAttached) {
+                // When cursor hovers over a bar
+                myPlot.on('plotly_hover', function(data) {
+                    const pointIndex = data.points[0].pointNumber;
+                    
+                    const opacities = years.map((_, i) => i === pointIndex ? 1 : 0.4);
+                    const lineColors = years.map((_, i) => i === pointIndex ? '#111111' : 'rgba(0,0,0,0.1)');
+                    const lineWidths = years.map((_, i) => i === pointIndex ? 3 : 1);
+
+                    // UPDATED: Now targets marker.opacity
+                    Plotly.restyle('emissionsChart', {
+                        'marker.opacity': [opacities],
+                        'marker.line.color': [lineColors],
+                        'marker.line.width': [lineWidths]
+                    });
+                });
+
+                // When cursor leaves the bar, snap back to default
+                myPlot.on('plotly_unhover', function(data) {
+                    // UPDATED: Now targets marker.opacity
+                    Plotly.restyle('emissionsChart', {
+                        'marker.opacity': 0.75,
+                        'marker.line.color': 'rgba(0,0,0,0.1)',
+                        'marker.line.width': 1
+                    });
+                });
+                
+                hoverListenersAttached = true;
+            }
         }
 
-        // 4. Initial Render
+        // Initial Render
         renderChart();
 
-        // 5. Re-render on Window Resize
+        // Re-render on Window Resize
         window.addEventListener('resize', renderChart);
 
     </script>
